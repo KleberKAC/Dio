@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafio Typescript 4 - BootCamp DIO-Santander</title>
+</head>
+<body>
+  <div style="display: flex;">
+    <div style="display: flex; width: 300px; height: 100px; justify-content: space-between; flex-direction: column;">
+        <input id="login" placeholder="Login" onchange="preencherLogin(event)">
+        <input id="senha" placeholder="Senha" type="password" onchange="preencherSenha(event)">
+        <input id="api-key" placeholder="Api Key" onchange="preencherApi()">
+        <button id="login-button" disabled>Login</button>
+      <div id= 'suaLista'>
+          <input id="nomedaLista" type="text" placeholder="Digite o Nome da Lista">
+          <input id="descricao" type="text" placeholder="Digite uma descrição para sual lista.">
+          <button id="criarLista">Criar Lista</button>
+      </div>
+    </div>
+
+      <div id="search-container" style="margin-left: 20px">
+        <input id="search" placeholder="Escreva...">
+        <button id="search-button">Pesquisar Filme</button>
+        <p>Primeiro Item: Nome do Filme</p>
+        <p>Segundoo Item: Id do Film</p>
+      </div>
+    <div id="importar">
+    <input id="idLista" type="text" placeholder="Digite o ID da lista">
+    <button id="recebeLista">Importar Lista</button> 
+  </div>
+
+  <div>
+    <input id="idFilm" type="text" placeholder="Digite o id do film">
+    <input id="lista" type="text" placeholder="Digite o id da sua lista">
+    <button id="adicionar">Adicionar filme a lista</button>
+  </div>
+</div>
+  <script src="./Desafio4.js"></script>
+</body>
+</html>
