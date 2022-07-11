@@ -35,94 +35,201 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-// minha apiKey '390c1f0924ab87a9cdd20b4499496cc7'
 var apiKey;
-var requestToken;
-var username;
+var listId;
+var mediaName;
 var password;
+var requestToken;
 var sessionId;
-var listId = document.getElementById('idLista').value;
-var loginButton = document.getElementById('login-button');
-var searchButton = document.getElementById('search-button');
-var searchContainer = document.getElementById('search-container');
-loginButton.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
+var username;
+var messagesSpan = document.getElementById("messages");
+var loginInput = document.getElementById("login");
+var passwordInput = document.getElementById("password");
+var apiKeyInput = document.getElementById("api-key");
+var loginButton = document.getElementById("login-button");
+var logoutButton = document.getElementById("logout-button");
+var searchMediaByNameInput = document.getElementById("search-media-by-name");
+var searchMediaByNameButton = document.getElementById("search-media-by-name-button");
+var searchMediaByListInput = document.getElementById("search-media-by-list-id");
+var searchMediaByListButton = document.getElementById("search-media-by-list-button");
+var searchContainer = document.getElementById("search-container");
+var divList = document.getElementById("div-list-container");
+var createListNameInput = document.getElementById("create-list-name");
+var createListDescriptionInput = document.getElementById("create-list-description");
+var createListButton = document.getElementById("create-list-button");
+var addMediaToListInputIdMedia = document.getElementById("add-media-to-list-id-media");
+var addMediaToListInputIdList = document.getElementById("add-media-to-list-id-list");
+var addMediaToListButton = document.getElementById("add-media-to-list-button");
+loginButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, criarRequestToken()];
+            case 0:
+                showMessage("success", "");
+                username = loginInput.value;
+                if (!username) {
+                    showMessage("error", "Informe o nome do usuário");
+                    return [2 /*return*/];
+                }
+                password = passwordInput.value;
+                if (!password) {
+                    showMessage("error", "Informe a senha");
+                    return [2 /*return*/];
+                }
+                apiKey = apiKeyInput.value;
+                if (!apiKey) {
+                    showMessage("error", "Informe a chave da api");
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, createRequestToken()];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, logar()];
+                return [4 /*yield*/, login()];
             case 2:
                 _a.sent();
-                return [4 /*yield*/, criarSessao()];
+                return [4 /*yield*/, createSession()];
             case 3:
                 _a.sent();
+                if (sessionId) {
+                    blockForms(false);
+                    blockLoginForm(true);
+                }
                 return [2 /*return*/];
         }
     });
 }); });
-searchButton.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
-    var lista, query, listaDeFilmes, ul, _i, _a, item, li, p;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+logoutButton.addEventListener("click", function () {
+    showMessage("success", "");
+    clearForms();
+    blockForms(true);
+    blockLoginForm(false);
+});
+searchMediaByNameButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        showMessage("success", "");
+        mediaName = searchMediaByNameInput.value;
+        if (!mediaName) {
+            showMessage("error", "Informe o nome da mídia");
+            return [2 /*return*/];
+        }
+        createListByMediaName("1");
+        searchMediaByNameInput.value = "";
+        return [2 /*return*/];
+    });
+}); });
+searchMediaByListButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        listId = searchMediaByListInput.value;
+        if (!listId) {
+            showMessage("error", "Informe o ID da lista");
+            return [2 /*return*/];
+        }
+        showMessage("success", "");
+        createListByListId();
+        searchMediaByListInput.value = "";
+        return [2 /*return*/];
+    });
+}); });
+createListButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+    var name, description, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                lista = document.getElementById("lista");
-                if (lista) {
-                    lista.outerHTML = "";
+                showMessage("success", "");
+                name = createListNameInput.value;
+                if (!name) {
+                    showMessage("error", "Informe o nome da lista");
+                    return [2 /*return*/];
                 }
-                query = document.getElementById('search').value;
-                return [4 /*yield*/, procurarFilme(query)];
+                description = createListDescriptionInput.value;
+                if (!description) {
+                    showMessage("error", "Informe a descrição da lista");
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, createMediaList(name, description)];
             case 1:
-                listaDeFilmes = _b.sent();
-                ul = document.createElement('ul');
-                ul.id = "lista";
-                for (_i = 0, _a = listaDeFilmes.results; _i < _a.length; _i++) {
-                    item = _a[_i];
-                    li = document.createElement('li');
-                    p = document.createElement('li');
-                    li.appendChild(document.createTextNode(item.original_title));
-                    p.appendChild(document.createTextNode(item.id));
-                    ul.appendChild(li);
-                    ul.appendChild(p);
-                }
-                console.log(listaDeFilmes);
-                searchContainer.appendChild(ul);
+                result = _a.sent();
+                if (result.success)
+                    showMessage("success", "Lista criada com sucesso, id = ".concat(result.list_id));
+                if (result.list_id)
+                    listId = result.list_id;
+                createListNameInput.value = "";
+                createListDescriptionInput.value = "";
                 return [2 /*return*/];
         }
     });
 }); });
-function preencherSenha() {
-    var senha = document.getElementById('senha');
-    password = senha.value;
-    validateLoginButton();
+addMediaToListButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+    var mediaId, listId, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                showMessage("success", "");
+                mediaId = addMediaToListInputIdMedia.value;
+                if (!mediaId) {
+                    showMessage("error", "Informe o ID da mídia");
+                    return [2 /*return*/];
+                }
+                listId = addMediaToListInputIdList.value;
+                if (!listId) {
+                    showMessage("error", "Informe o ID da lista");
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, addMediaToList(mediaId, listId)];
+            case 1:
+                result = _a.sent();
+                if (result.success)
+                    showMessage("success", "Media adicionada na lista com sucesso");
+                addMediaToListInputIdMedia.value = "";
+                addMediaToListInputIdList.value = "";
+                return [2 /*return*/];
+        }
+    });
+}); });
+function blockForms(disabled) {
+    searchMediaByNameInput.disabled = disabled;
+    searchMediaByNameButton.disabled = disabled;
+    createListNameInput.disabled = disabled;
+    createListDescriptionInput.disabled = disabled;
+    createListButton.disabled = disabled;
+    addMediaToListInputIdMedia.disabled = disabled;
+    addMediaToListInputIdList.disabled = disabled;
+    addMediaToListButton.disabled = disabled;
+    searchMediaByListInput.disabled = disabled;
+    searchMediaByListButton.disabled = disabled;
 }
-function preencherLogin() {
-    var user = document.getElementById('login');
-    username = user.value;
-    validateLoginButton();
+function blockLoginForm(disabled) {
+    loginInput.disabled = disabled;
+    passwordInput.disabled = disabled;
+    apiKeyInput.disabled = disabled;
+    loginButton.disabled = disabled;
+    logoutButton.disabled = !disabled;
 }
-function preencherApi() {
-    var myKey = document.getElementById('api-key');
-    apiKey = myKey.value;
-    validateLoginButton();
+function clearForms() {
+    loginInput.value = "";
+    passwordInput.value = "";
+    apiKeyInput.value = "";
+    searchMediaByNameInput.value = "";
+    createListNameInput.value = "";
+    createListDescriptionInput.value = "";
+    addMediaToListInputIdMedia.value = "";
+    addMediaToListInputIdList.value = "";
+    searchMediaByListInput.value = "";
+    divList.innerHTML = "";
 }
-function validateLoginButton() {
-    if (password && username && apiKey) {
-        loginButton.disabled = false;
-    }
-    else {
-        loginButton.disabled = true;
-    }
+function showMessage(type, message) {
+    messagesSpan.classList.add(type);
+    messagesSpan.innerText = message;
 }
 var HttpClient = /** @class */ (function () {
     function HttpClient() {
     }
     HttpClient.get = function (_a) {
-        var _b = _a.url, url = _b === void 0 ? "" : _b, _c = _a.method, method = _c === void 0 ? "" : _c, _d = _a.body, body = _d === void 0 ? "" : _d;
+        var url = _a.url, method = _a.method, _b = _a.body, body = _b === void 0 ? {} : _b;
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_e) {
+            return __generator(this, function (_c) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         var request = new XMLHttpRequest();
+                        var borySend = "";
                         request.open(method, url, true);
                         request.onload = function () {
                             if (request.status >= 200 && request.status < 300) {
@@ -131,8 +238,9 @@ var HttpClient = /** @class */ (function () {
                             else {
                                 reject({
                                     status: request.status,
-                                    statusText: request.statusText
+                                    responseText: request.responseText
                                 });
+                                showMessage("error", (JSON.parse(request.responseText)).status_message);
                             }
                         };
                         request.onerror = function () {
@@ -143,82 +251,49 @@ var HttpClient = /** @class */ (function () {
                         };
                         if (body) {
                             request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                            body = JSON.stringify(body);
+                            borySend = JSON.stringify(body);
                         }
-                        request.send(body);
+                        request.send(borySend);
                     })];
             });
         });
     };
     return HttpClient;
 }());
-function procurarFilme(query) {
-    return __awaiter(this, void 0, void 0, function () {
-        var result;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    query = encodeURI(query);
-                    console.log(query);
-                    return [4 /*yield*/, HttpClient.get({
-                            url: "https://api.themoviedb.org/3/search/movie?api_key=".concat(apiKey, "&query=").concat(query),
-                            method: "GET"
-                        })];
-                case 1:
-                    result = _a.sent();
-                    return [2 /*return*/, result];
-            }
-        });
-    });
-}
-function adicionarFilme(filmeId) {
+function createRequestToken() {
     return __awaiter(this, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, HttpClient.get({
-                        url: "https://api.themoviedb.org/3/movie/".concat(filmeId, "?api_key=").concat(apiKey, "&language=en-US"),
+                        url: "https://api.themoviedb.org/3/authentication/token/new?api_key=".concat(apiKey),
                         method: "GET"
                     })];
                 case 1:
                     result = _a.sent();
-                    console.log(result);
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function criarRequestToken() {
-    return __awaiter(this, void 0, void 0, function () {
-        var result;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    ;
-                    return [4 /*yield*/, HttpClient.get({
-                            url: "https://api.themoviedb.org/3/authentication/token/new?api_key=".concat(apiKey),
-                            method: "GET"
-                        })];
-                case 1:
-                    result = _a.sent();
+                    if (result.success === false) {
+                        if (result.status_message)
+                            showMessage("error", result.status_message);
+                        return [2 /*return*/];
+                    }
                     requestToken = result.request_token;
                     return [2 /*return*/];
             }
         });
     });
 }
-function logar() {
+function login() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, HttpClient.get({
                         url: "https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=".concat(apiKey),
                         method: "POST",
-                        body: JSON.stringify({
+                        body: {
                             username: "".concat(username),
                             password: "".concat(password),
                             request_token: "".concat(requestToken)
-                        })
+                        }
                     })];
                 case 1:
                     _a.sent();
@@ -227,164 +302,195 @@ function logar() {
         });
     });
 }
-function criarSessao() {
+function createSession() {
     return __awaiter(this, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    return [4 /*yield*/, HttpClient.get({
-                            url: "https://api.themoviedb.org/3/authentication/session/new?api_key=".concat(apiKey, "&request_token=").concat(requestToken),
-                            method: "GET"
-                        })];
+                case 0: return [4 /*yield*/, HttpClient.get({
+                        url: "https://api.themoviedb.org/3/authentication/session/new?api_key=".concat(apiKey, "&request_token=").concat(requestToken),
+                        method: "GET"
+                    })];
                 case 1:
-                    result = _a.sent();
-                    sessionId = Number(result.session_id);
+                    result = (_a.sent());
+                    sessionId = result.session_id;
                     return [2 /*return*/];
             }
         });
     });
 }
-var itensLista = document.getElementById('suaLista');
-var botaoLista = document.getElementById('criarLista');
-var nLista;
-function criarLista(nomeDaLista, descricao) {
+function searchMediaByMediaName(query, page) {
     return __awaiter(this, void 0, void 0, function () {
-        var result, retornoLista;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    query = encodeURI(query);
+                    return [4 /*yield*/, HttpClient.get({
+                            url: "https://api.themoviedb.org/3/search/movie?api_key=".concat(apiKey, "&query=").concat(query, "&page=").concat(page),
+                            method: "GET"
+                        })];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+function searchMediaByListId(listId) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, HttpClient.get({
+                        url: "https://api.themoviedb.org/3/list/".concat(listId, "?api_key=").concat(apiKey),
+                        method: "GET"
+                    })];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+function createList(medias) {
+    return __awaiter(this, void 0, void 0, function () {
+        var list, ul, _i, medias_1, media, li;
+        return __generator(this, function (_a) {
+            list = document.getElementById("list");
+            if (list) {
+                list.outerHTML = "";
+            }
+            ul = document.createElement("ul");
+            ul.id = "list";
+            for (_i = 0, medias_1 = medias; _i < medias_1.length; _i++) {
+                media = medias_1[_i];
+                li = document.createElement("li");
+                li.appendChild(document.createTextNode("".concat(media.id, " - ").concat(media.original_title)));
+                ul.appendChild(li);
+            }
+            divList.appendChild(ul);
+            return [2 /*return*/];
+        });
+    });
+}
+function createListByMediaName(page) {
+    return __awaiter(this, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    divList.innerHTML = "";
+                    return [4 /*yield*/, searchMediaByMediaName(mediaName, page)];
+                case 1:
+                    result = _a.sent();
+                    if (result.total_results === 0) {
+                        showMessage("error", "N\u00E3o encontramos nenhum resultado para ".concat(mediaName));
+                        return [2 /*return*/];
+                    }
+                    ;
+                    createPaginate(result.page, result.total_pages);
+                    createList(result.results);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function createListByListId() {
+    return __awaiter(this, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    divList.innerHTML = "";
+                    return [4 /*yield*/, searchMediaByListId(listId)];
+                case 1:
+                    result = _a.sent();
+                    if (result.item_count === 0) {
+                        showMessage("error", "N\u00E3o encontramos nenhum resultado para ".concat(listId));
+                        return [2 /*return*/];
+                    }
+                    ;
+                    createList(result.items);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function createPaginate(mediasPage, mediasTotalPage) {
+    var _this = this;
+    var divPaginate = document.createElement("div");
+    var previuButton = document.createElement("button");
+    var nextButton = document.createElement("button");
+    var paginateText = document.createElement("p");
+    var page = document.createElement("span");
+    var separator = document.createElement("span");
+    var totalPage = document.createElement("span");
+    divPaginate.id = "paginate-buttons";
+    previuButton.id = "previu-button";
+    nextButton.id = "next-button";
+    paginateText.id = "paginate-text";
+    page.id = "number-page";
+    separator.id = "separator-page";
+    totalPage.id = "total-page";
+    previuButton.innerText = "Anterior";
+    nextButton.innerText = "Próximo";
+    page.innerText = mediasPage;
+    separator.innerText = "/";
+    totalPage.innerText = mediasTotalPage;
+    paginateText.appendChild(page);
+    paginateText.appendChild(separator);
+    paginateText.appendChild(totalPage);
+    divPaginate.appendChild(previuButton);
+    divPaginate.appendChild(paginateText);
+    divPaginate.appendChild(nextButton);
+    divList.appendChild(divPaginate);
+    if (Number(mediasPage) < 2)
+        previuButton.disabled = true;
+    if (Number(mediasPage) >= Number(mediasTotalPage))
+        nextButton.disabled = true;
+    previuButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+        var page;
+        return __generator(this, function (_a) {
+            page = String(Number(mediasPage) - 1);
+            createListByMediaName(page);
+            return [2 /*return*/];
+        });
+    }); });
+    nextButton.addEventListener("click", function () { return __awaiter(_this, void 0, void 0, function () {
+        var page;
+        return __generator(this, function (_a) {
+            page = String(Number(mediasPage) + 1);
+            createListByMediaName(page);
+            return [2 /*return*/];
+        });
+    }); });
+}
+function createMediaList(name, description) {
+    return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, HttpClient.get({
                         url: "https://api.themoviedb.org/3/list?api_key=".concat(apiKey, "&session_id=").concat(sessionId),
                         method: "POST",
-                        body: JSON.stringify({
-                            name: nomeDaLista,
-                            description: descricao,
+                        body: {
+                            name: name,
+                            description: description,
                             language: "pt-br"
-                        })
+                        }
                     })];
-                case 1:
-                    result = _a.sent();
-                    retornoLista = result;
-                    nLista = retornoLista.list_id;
-                    return [2 /*return*/];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
 }
-botaoLista.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
-    var nomeLista, descricaoLista, criaLista, div, item;
-    var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                nomeLista = document.getElementById('nomedaLista').value;
-                descricaoLista = document.getElementById('descricao').value;
-                return [4 /*yield*/, criarLista(nomeLista, descricaoLista)];
-            case 1:
-                criaLista = _b.sent();
-                div = document.createElement('div');
-                item = document.createElement('div');
-                item.innerHTML = "Nome: ".concat(nomeLista, "Id: ").concat(nLista, "\n  Descri\u00E7\u00E3o: ").concat(descricaoLista);
-                (_a = document.getElementById('suaLista')) === null || _a === void 0 ? void 0 : _a.appendChild(item);
-                itensLista.appendChild(div);
-                return [2 /*return*/];
-        }
-    });
-}); });
-var adicionarFilmes;
-function adicionarFilmeNaLista(filmeId, listaId) {
+function addMediaToList(mediaId, listId) {
     return __awaiter(this, void 0, void 0, function () {
-        var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, HttpClient.get({
-                        url: "https://api.themoviedb.org/3/list/".concat(listaId, "/add_item?api_key=").concat(apiKey, "&session_id=").concat(sessionId),
+                        url: "https://api.themoviedb.org/3/list/".concat(listId, "/add_item?api_key=").concat(apiKey, "&session_id=").concat(sessionId),
                         method: "POST",
-                        body: JSON.stringify({
-                            media_id: filmeId
-                        })
+                        body: {
+                            media_id: mediaId
+                        }
                     })];
-                case 1:
-                    result = _a.sent();
-                    return [2 /*return*/, adicionarFilmes];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
 }
-var btnAdicionar = document.getElementById('adicionar');
-btnAdicionar.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
-    var inputLista, inputFilme, adicionarFilme;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                inputLista = document.getElementById('lista').value;
-                inputFilme = document.getElementById('idFilm').value;
-                return [4 /*yield*/, adicionarFilmeNaLista(Number(inputFilme), inputLista)];
-            case 1:
-                adicionarFilme = _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); });
-var importNameList;
-var importDescricao;
-var importIdLista;
-var importFilme;
-var importNomeFilme;
-function pegarLista() {
-    return __awaiter(this, void 0, void 0, function () {
-        var listaId, result, objetoLista;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    listaId = document.getElementById('idLista').value;
-                    return [4 /*yield*/, HttpClient.get({
-                            url: "https://api.themoviedb.org/3/list/".concat(listId, "?api_key=").concat(apiKey),
-                            method: "GET"
-                        })];
-                case 1:
-                    result = _a.sent();
-                    objetoLista = result;
-                    console.log(result);
-                    importNameList = objetoLista.name;
-                    importDescricao = objetoLista.description;
-                    importIdLista = objetoLista.id;
-                    importFilme = objetoLista.items;
-                    importNomeFilme = [];
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-var btnImport = document.getElementById('recebeLista');
-var importar = document.getElementById('importar');
-btnImport === null || btnImport === void 0 ? void 0 : btnImport.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
-    var receberLista, lista, _i, importFilme_1, item_1, l1, i, item, k, li;
-    var _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0: return [4 /*yield*/, pegarLista()];
-            case 1:
-                receberLista = _c.sent();
-                lista = document.getElementById('lista');
-                for (_i = 0, importFilme_1 = importFilme; _i < importFilme_1.length; _i++) {
-                    item_1 = importFilme_1[_i];
-                    l1 = importFilme.lenght - 1;
-                    console.log(l1);
-                    for (i = 0; (i + l1) < importFilme.length; i++) {
-                        importNomeFilme.push(item_1.original_title);
-                    }
-                }
-                item = document.createElement('div');
-                item.innerHTML = " nome: ".concat(importNameList, "id: ").concat(importIdLista, "\n    descri\u00E7\u00E3o: ").concat(importDescricao, " \n    <ul id=\"lista\"></ul>");
-                (_a = document.getElementById('importar')) === null || _a === void 0 ? void 0 : _a.appendChild(item);
-                for (k = 0; k < importNomeFilme.length; k++) {
-                    li = document.createElement('li');
-                    li.appendChild(document.createTextNode(importNomeFilme[k]));
-                    lista === null || lista === void 0 ? void 0 : lista.appendChild(li);
-                    (_b = document.getElementById('importar')) === null || _b === void 0 ? void 0 : _b.appendChild(li);
-                }
-                return [2 /*return*/];
-        }
-    });
-}); });
