@@ -1,2 +1,0 @@
-Wrap - Quebra de linha
-Reverse - Direita para esquerda
